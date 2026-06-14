@@ -1,7 +1,7 @@
 <h1 align="center">🧠 Recall</h1>
 
 <p align="center">
-  <b>A fully-local, self-evolving personal knowledge base for Copilot — and any agentic CLI.</b><br/>
+  <b>A fully-local, self-evolving personal knowledge base for any agentic CLI.</b><br/>
   Capture the decisions, tradeoffs, gotchas, and open threads from every session.<br/>
   Retrieve them in future sessions via local hybrid RAG (BM25 + Ollama), exposed over MCP.
 </p>
