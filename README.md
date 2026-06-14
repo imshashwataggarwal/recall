@@ -51,6 +51,21 @@ no telemetry.
 - 🛟 **Resilient** — degrades gracefully: no `sqlite-vec` → BM25-only; Ollama down →
   keyword search still works. It never hard-fails.
 
+Most memory systems store facts. Recall builds a living memory graph.
+
+Memories are linked, consolidated, and evolve over time.
+
+### Comparison
+
+| Capability | Traditional Memory | Recall |
+|------------|-------------------|---------|
+| Store facts | ✅ | ✅ |
+| Semantic retrieval | ✅ | ✅ |
+| Human-readable memory | ❌ | ✅ |
+| Relationship graph | ❌ | ✅ |
+| Memory consolidation | ❌ | ✅ |
+| Knowledge evolution | ❌ | ✅ |
+
 ## How it works
 
 ```mermaid
