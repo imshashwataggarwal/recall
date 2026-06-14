@@ -55,6 +55,8 @@ Most memory systems store facts. Recall builds a living memory graph.
 
 Memories are linked, consolidated, and evolve over time.
 
+This makes Recall closer to a personal knowledge system than a traditional memory database.
+
 ### Comparison
 
 | Capability | Traditional Memory | Recall |
@@ -65,6 +67,19 @@ Memories are linked, consolidated, and evolve over time.
 | Relationship graph | ❌ | ✅ |
 | Memory consolidation | ❌ | ✅ |
 | Knowledge evolution | ❌ | ✅ |
+
+| Capability | Recall | Mem0 | Claude-Mem |
+|------------|---------|---------|---------|
+| Personal memory | ✅ | ✅ | ✅ |
+| Local-first architecture | ✅ | ❌ | ✅ |
+| MCP-native integration | ✅ | ⚠️ Limited | ⚠️ Varies |
+| Knowledge graph | ✅ | ❌ | ❌ |
+| Markdown-first storage | ✅ | ❌ | ⚠️ Partial |
+| Human-readable memory | ✅ | ❌ | ⚠️ Partial |
+| Memory consolidation | ✅ | ✅ | ⚠️ Basic |
+| Agent-centric design | ✅ | ✅ | ✅ |
+
+> **Note:** Features and implementation details are based on publicly available information and may evolve over time.
 
 ## How it works
 
