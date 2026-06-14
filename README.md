@@ -6,6 +6,8 @@
   Retrieve them in future sessions via local hybrid RAG (BM25 + Ollama), exposed over MCP.
 </p>
 
+<img src=".github/banner.png" alt="Recall" width="100%" />
+
 <p align="center">
   <a href="https://imshashwataggarwal.github.io/recall/"><img alt="website" src="https://img.shields.io/badge/website-live-6e5494"></a>
   <a href="#install"><img alt="install" src="https://img.shields.io/badge/install-one_command-2ea44f"></a>
