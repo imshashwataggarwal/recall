@@ -1,6 +1,8 @@
 <h1 align="center">🧠 Recall</h1>
 
-<img src=".github/banner.png" alt="Recall" />
+<div align="center">
+  <img src=".github/banner.png" alt="Recall" width="200" />
+</div>
 
 <p align="center">
   <b>A fully-local, self-evolving personal knowledge base for any agentic CLI.</b><br/>
