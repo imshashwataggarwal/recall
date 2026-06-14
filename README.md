@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  🌐 <b><a href="https://imshashwataggarwal.github.io/recall/">imshashwataggarwal.github.io/recall</a></b> — project site with a one-click download
+  🌐 <b><a href="https://imshashwataggarwal.github.io/recall/">imshashwataggarwal.github.io/recall</a></b> — one-click download
 </p>
 
 ---
