@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+build/
+dist/
+
+# Recall runtime data (default home + ad-hoc test homes)
+.recall/
+.recall-*/
+
+# Local planning notes (not part of the published project)
+plan.md

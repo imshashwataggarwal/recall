@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recall — local, self-evolving memory for Copilot &amp; agentic CLIs</title>
+<meta name="description" content="Recall is a fully-local, self-evolving personal knowledge base that gives Copilot and any agentic CLI persistent, searchable memory. Local RAG (BM25 + vectors) over Markdown, exposed via CLI and MCP. Your data never leaves your machine." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+<style>
+  :root{
+    --bg:#0b0e14; --bg2:#11151f; --card:#151a26; --line:#222a3a;
+    --fg:#e6e9ef; --muted:#9aa4b8; --accent:#6ea8fe; --accent2:#7ee0c0;
+    --radius:14px; --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#16243f 0%,var(--bg) 55%) no-repeat,var(--bg);
+    color:var(--fg); line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+  code,pre{font-family:"SF Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace}
+
+  /* nav */
+  nav{display:flex; align-items:center; justify-content:space-between; padding:18px 22px; max-width:var(--maxw); margin:0 auto}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px}
+  .brand .logo{font-size:22px}
+  .nav-links{display:flex; gap:22px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:14px}
+  .nav-links a:hover{color:var(--fg); text-decoration:none}
+
+  /* hero */
+  .hero{text-align:center; padding:70px 0 40px}
+  .badge{display:inline-block; font-size:12.5px; color:var(--accent2); border:1px solid var(--line);
+    background:var(--bg2); padding:6px 12px; border-radius:999px; margin-bottom:22px}
+  .hero h1{font-size:clamp(34px,6vw,58px); line-height:1.08; margin:0 0 16px; letter-spacing:-.02em}
+  .hero h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero p.lead{font-size:clamp(16px,2.4vw,20px); color:var(--muted); max-width:680px; margin:0 auto 32px}
+  .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap}
+  .btn{display:inline-flex; align-items:center; gap:9px; padding:13px 22px; border-radius:12px; font-weight:600; font-size:15px; border:1px solid transparent; cursor:pointer; transition:transform .08s ease, box-shadow .2s ease}
+  .btn:hover{text-decoration:none; transform:translateY(-1px)}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),#8f7bff); color:#0b0e14; box-shadow:0 8px 30px -10px var(--accent)}
+  .btn-ghost{background:var(--card); color:var(--fg); border-color:var(--line)}
+  .sub-note{margin-top:16px; font-size:13px; color:var(--muted)}
+
+  /* install strip */
+  .install{margin:30px auto 0; max-width:760px}
+  .install .tabs{display:flex; gap:8px; justify-content:center; margin-bottom:10px}
+  .tab{font-size:13px; color:var(--muted); background:var(--bg2); border:1px solid var(--line); padding:6px 12px; border-radius:8px; cursor:pointer}
+  .tab.active{color:var(--fg); border-color:var(--accent)}
+  .codebox{position:relative; background:#0a0d14; border:1px solid var(--line); border-radius:12px; text-align:left; overflow:auto}
+  .codebox pre{margin:0; padding:18px 54px 18px 18px; font-size:13.5px; color:#cdd6f4; white-space:pre}
+  .copy{position:absolute; top:10px; right:10px; font-size:12px; padding:6px 10px; border-radius:7px; border:1px solid var(--line); background:var(--card); color:var(--muted); cursor:pointer}
+  .copy:hover{color:var(--fg)}
+
+  /* sections */
+  section{padding:56px 0; border-top:1px solid var(--line)}
+  h2{font-size:clamp(24px,4vw,34px); margin:0 0 14px; letter-spacing:-.01em}
+  .section-lead{color:var(--muted); max-width:720px; margin:0 0 34px; font-size:16px}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px}
+  .card .ic{font-size:24px; margin-bottom:10px}
+  .card h3{margin:0 0 8px; font-size:17px}
+  .card p{margin:0; color:var(--muted); font-size:14.5px}
+
+  /* how it works */
+  .flow{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; overflow:auto}
+  .steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:26px}
+  .step{position:relative; padding-left:42px}
+  .step .n{position:absolute; left:0; top:0; width:30px; height:30px; border-radius:50%; background:var(--bg2); border:1px solid var(--accent); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px}
+  .step h4{margin:2px 0 6px; font-size:15.5px}
+  .step p{margin:0; color:var(--muted); font-size:14px}
+
+  .mermaid{display:flex; justify-content:center}
+
+  /* footer */
+  footer{border-top:1px solid var(--line); padding:34px 0; color:var(--muted); font-size:14px; text-align:center}
+  .pill{display:inline-block; font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:3px 10px; margin:0 4px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand"><span class="logo">🧠</span> Recall</div>
+  <div class="nav-links">
+    <a href="#what">What</a>
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/imshashwataggarwal/recall">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <span class="badge">100% local · BM25 + vectors · MCP-native · MIT</span>
+  <h1>Persistent memory for<br/><span class="grad">Copilot &amp; any agentic CLI</span></h1>
+  <p class="lead">
+    Recall is a fully-local, self-evolving personal knowledge base. Your agent writes what it
+    learns to plain Markdown, and Recall turns it into hybrid (keyword&nbsp;+&nbsp;semantic)
+    searchable memory — so the next session already knows what the last one figured out.
+    <strong>Nothing ever leaves your machine.</strong>
+  </p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/imshashwataggarwal/recall/archive/refs/heads/main.zip" download>
+      ⬇️ Download Recall
+    </a>
+    <a class="btn btn-ghost" href="https://github.com/imshashwataggarwal/recall">★ View on GitHub</a>
+  </div>
+  <div class="sub-note">Downloads the latest source (<code>main.zip</code>). Prefer a one-liner? See <a href="#install">Install</a>.</div>
+
+  <div class="install">
+    <div class="codebox">
+      <button class="copy" data-copy="curl -fsSL https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.sh | bash">Copy</button>
+      <pre># macOS / Linux — one command
+curl -fsSL https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.sh | bash</pre>
+    </div>
+  </div>
+</header>
+
+<section id="what" class="wrap">
+  <h2>What is Recall?</h2>
+  <p class="section-lead">
+    Agentic CLIs are brilliant in a session and amnesiac between them. Recall is the memory layer
+    that fixes that — a small, local tool that captures decisions, fixes, and context as you work,
+    then retrieves the most relevant pieces the moment a new session needs them.
+  </p>
+  <div class="grid">
+    <div class="card">
+      <div class="ic">📝</div><h3>Markdown is the source of truth</h3>
+      <p>Every memory is an append-only, timestamped entry in a human-readable Markdown file under <code>~/.recall</code>. The SQLite index is just a rebuildable cache.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🔍</div><h3>Hybrid retrieval</h3>
+      <p>FTS5 BM25 keyword search fused with <code>sqlite-vec</code> semantic vectors via Reciprocal Rank Fusion, with recency decay — so it finds the right thing even with zero word overlap.</p>
+    </div>
+    <div class="card">
+      <div class="ic">🔒</div><h3>Fully local &amp; private</h3>
+      <p>Embeddings run on local Ollama. No cloud, no API keys, no telemetry. Degrades gracefully to keyword-only if optional pieces aren’t installed.</p>
+    </div>
+    <div class="card">
+      <div class="ic">♻️</div><h3>Self-evolving</h3>
+      <p>A consolidation loop distills raw entries into durable per-workstream summaries and a catalog, so memory gets <em>more</em> useful over time, not noisier.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="wrap">
+  <h2>How it works</h2>
+  <p class="section-lead">
+    Recall plugs into your agent two ways: as a set of <strong>MCP tools</strong> the agent calls
+    directly, and as a <strong>session-end hook</strong> that captures what just happened. Both read
+    and write the same local store.
+  </p>
+  <div class="flow">
+    <div class="mermaid">
+flowchart LR
+    A[Agent / Copilot CLI] -->|mem_append| B[Capture]
+    A -->|mem_search| F[Hybrid search]
+    H[Session-end hook] -->|auto-capture| B
+    B --> M[(Markdown<br/>~/.recall/sessions)]
+    M --> I[Indexer]
+    I --> D[(SQLite<br/>FTS5 + sqlite-vec)]
+    F --> D
+    E[Ollama<br/>embeddinggemma] -. embeddings .-> I
+    E -. query vector .-> F
+    F -->|ranked context| A
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h4>Capture</h4><p>The agent (or the hook) appends an atomic entry to a Markdown workstream file — never overwriting history.</p></div>
+    <div class="step"><div class="n">2</div><h4>Index</h4><p>Changed entries are chunked and embedded locally, then written incrementally to the SQLite BM25 + vector index.</p></div>
+    <div class="step"><div class="n">3</div><h4>Retrieve</h4><p>A query runs keyword + semantic search, fuses the rankings, decays by age, and returns cited context.</p></div>
+    <div class="step"><div class="n">4</div><h4>Consolidate</h4><p>Periodically, raw entries are distilled into durable summaries — the loop that keeps memory sharp.</p></div>
+  </div>
+</section>
+
+<section id="features" class="wrap">
+  <h2>Why it’s nice to live with</h2>
+  <div class="grid">
+    <div class="card"><div class="ic">⚡</div><h3>Zero-config start</h3><p>One install command sets up the CLI, the <code>recall-mcp</code> server, and (optionally) pulls a local embedding model.</p></div>
+    <div class="card"><div class="ic">🧩</div><h3>Agent-agnostic</h3><p>Works with Copilot CLI out of the box and any MCP-capable agent. An <code>AGENTS.md</code> ships in the repo.</p></div>
+    <div class="card"><div class="ic">🛡️</div><h3>Never breaks your shutdown</h3><p>The session-end hook is fail-safe: bad input or a missing index just exits cleanly, never blocking the agent.</p></div>
+    <div class="card"><div class="ic">🧳</div><h3>Portable memory</h3><p>Your knowledge lives in a folder. <code>git init</code> it or sync it across machines — the index rebuilds itself.</p></div>
+    <div class="card"><div class="ic">🧪</div><h3>Tested &amp; offline-friendly</h3><p>A full pytest suite runs without a network using a fake embedder. CI included.</p></div>
+    <div class="card"><div class="ic">📖</div><h3>Documented</h3><p>Architecture, design, call-flows, configuration and CLI reference — all in <a href="https://github.com/imshashwataggarwal/recall/tree/main/docs">/docs</a>.</p></div>
+  </div>
+</section>
+
+<section id="install" class="wrap">
+  <h2>Get started</h2>
+  <p class="section-lead">Pick whichever fits your setup. All three give you the <code>recall</code> and <code>recall-mcp</code> commands.</p>
+
+  <div class="install" style="max-width:none">
+    <div class="tabs">
+      <button class="tab active" data-tab="mac">macOS / Linux</button>
+      <button class="tab" data-tab="win">Windows</button>
+      <button class="tab" data-tab="pipx">pipx (from source)</button>
+    </div>
+
+    <div class="codebox" data-panel="mac">
+      <button class="copy" data-copy="curl -fsSL https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.sh | bash">Copy</button>
+      <pre>curl -fsSL https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.sh | bash</pre>
+    </div>
+
+    <div class="codebox hide" data-panel="win">
+      <button class="copy" data-copy="irm https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.ps1 | iex">Copy</button>
+      <pre>irm https://raw.githubusercontent.com/imshashwataggarwal/recall/main/scripts/install.ps1 | iex</pre>
+    </div>
+
+    <div class="codebox hide" data-panel="pipx">
+      <button class="copy" data-copy='pipx install "git+https://github.com/imshashwataggarwal/recall.git#egg=recall[mcp]"'>Copy</button>
+      <pre>pipx install "git+https://github.com/imshashwataggarwal/recall.git#egg=recall[mcp]"</pre>
+    </div>
+  </div>
+
+  <p style="margin-top:26px">
+    Then point your agent at the MCP server and you’re done. Full setup &amp; wiring:
+    <a href="https://github.com/imshashwataggarwal/recall/blob/main/docs/installation.md">installation guide</a> ·
+    <a href="https://github.com/imshashwataggarwal/recall/blob/main/docs/mcp-and-copilot.md">MCP &amp; Copilot integration</a>.
+  </p>
+
+  <div class="cta" style="justify-content:flex-start; margin-top:24px">
+    <a class="btn btn-primary" href="https://github.com/imshashwataggarwal/recall/archive/refs/heads/main.zip" download>⬇️ Download Recall</a>
+    <a class="btn btn-ghost" href="https://github.com/imshashwataggarwal/recall">★ View on GitHub</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="pill">Python ≥ 3.10</span>
+    <span class="pill">SQLite FTS5 + sqlite-vec</span>
+    <span class="pill">Ollama</span>
+    <span class="pill">MCP</span>
+    <span class="pill">MIT License</span>
+    <p style="margin:16px 0 0">
+      Built for people who want their tools to remember. ·
+      <a href="https://github.com/imshashwataggarwal/recall">github.com/imshashwataggarwal/recall</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  // Mermaid theme to match the page
+  if (window.mermaid) {
+    mermaid.initialize({
+      startOnLoad:true,
+      theme:"base",
+      themeVariables:{
+        background:"#151a26", primaryColor:"#1b2230", primaryTextColor:"#e6e9ef",
+        primaryBorderColor:"#2b3650", lineColor:"#6ea8fe", secondaryColor:"#16243f",
+        tertiaryColor:"#11151f", fontSize:"14px"
+      }
+    });
+  }
+
+  // Copy buttons
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var text = btn.getAttribute("data-copy");
+      navigator.clipboard.writeText(text).then(function(){
+        var old = btn.textContent; btn.textContent = "Copied!";
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+      });
+    });
+  });
+
+  // Install tabs
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(tab){
+    tab.addEventListener("click", function(){
+      tabs.forEach(function(t){ t.classList.remove("active"); });
+      tab.classList.add("active");
+      var which = tab.getAttribute("data-tab");
+      document.querySelectorAll("[data-panel]").forEach(function(p){
+        p.classList.toggle("hide", p.getAttribute("data-panel") !== which);
+      });
+    });
+  });
+</script>
+</body>
+</html>
