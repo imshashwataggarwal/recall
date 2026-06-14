@@ -5,6 +5,11 @@
 </div>
 
 <p align="center">
+  🌐 <b><a href="https://imshashwataggarwal.github.io/recall/">imshashwataggarwal.github.io/recall</a></b> — Install Now!
+</p>
+
+
+<p align="center">
   <b>A fully-local, self-evolving personal knowledge base for any agentic CLI.</b><br/>
   Capture the decisions, tradeoffs, gotchas, and open threads from every session.<br/>
   Retrieve them in future sessions via local hybrid RAG (BM25 + Ollama), exposed over MCP.
@@ -18,11 +23,6 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-lightgrey"></a>
   <img alt="tests" src="https://img.shields.io/badge/tests-16_passing-2ea44f">
 </p>
-
-<p align="center">
-  🌐 <b><a href="https://imshashwataggarwal.github.io/recall/">imshashwataggarwal.github.io/recall</a></b> — one-click download
-</p>
-
 ---
 
 ## What is Recall?
